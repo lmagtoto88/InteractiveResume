@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Printing Services Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .main-tab-button {
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+        }
+        .main-tab-button.active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        .main-tab-button:not(.active) {
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+        }
+        .sub-tab-button {
+            transition: all 0.3s ease;
+        }
+        .sub-tab-button.active {
+            background-color: #3b82f6;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .sub-tab-button:not(.active) {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .price-display {
+            background: #1f2937;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        .input-group input {
+            border-right: none;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .input-group select {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        #settingsModal {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen py-8">
+
+    <div class="w-full max-w-lg mx-auto bg-white rounded-2xl shadow-lg border border-gray-200/80">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+            <div class="flex-1">
+                <h1 class="text-2xl font-bold text-slate-800 text-center">Printing Services Calculator</h1>
+                <p class="text-sm text-slate-500 text-center mt-1">Estimate costs for your printing needs.</p>
+            </div>
+            <button id="settingsBtn" class="text-slate-500 hover:text-blue-600 transition-colors">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Main Mode Tabs -->
+        <div class="flex border-b border-gray-200">
+            <button id="tarpaulinMainTab" class="main-tab-button py-4 px-4 text-sm font-medium">Tarpaulin</button>
+            <button id="stickerMainTab" class="main-tab-button py-4 px-4 text-sm font-medium">Sticker</button>
+            <button id="sintraMainTab" class="main-tab-button py-4 px-4 text-sm font-medium">Sintra Board</button>
+            <button id="documentMainTab" class="main-tab-button py-4 px-4 text-sm font-medium">Document</button>
+        </div>
+
+        <!-- Calculator Form -->
+        <div class="p-8">
+            <!-- Tarpaulin Calculator Section -->
+            <div id="tarpaulinCalculator" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="tarpWidth" class="text-sm font-medium text-slate-600">Width</label>
+                        <div class="input-group mt-1">
+                            <input type="number" id="tarpWidth" placeholder="e.g., 3" class="w-full p-3 bg-white border border-slate-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition z-10">
+                            <select id="tarpWidthUnit" class="p-3 bg-slate-50 border border-slate-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none">
+                                <option value="ft" selected>ft</option>
+                                <option value="in">in</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="tarpHeight" class="text-sm font-medium text-slate-600">Height</label>
+                         <div class="input-group mt-1">
+                            <input type="number" id="tarpHeight" placeholder="e.g., 5" class="w-full p-3 bg-white border border-slate-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition z-10">
+                            <select id="tarpHeightUnit" class="p-3 bg-slate-50 border border-slate-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none">
+                                <option value="ft" selected>ft</option>
+                                <option value="in">in</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticker Calculator Section -->
+            <div id="stickerCalculator" class="hidden space-y-6">
+                <div class="p-2 bg-gray-100 grid grid-cols-2 gap-2 rounded-lg">
+                    <button id="stickerLargeFormatTab" class="sub-tab-button py-2 px-4 rounded-md text-sm">Large Format</button>
+                    <button id="stickerDocSizeTab" class="sub-tab-button py-2 px-4 rounded-md text-sm">Document Size</button>
+                </div>
+                <div id="stickerLargeFormatSection">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label for="stickerWidth" class="text-sm font-medium text-slate-600">Width (in)</label>
+                            <input type="number" id="stickerWidth" placeholder="e.g., 3" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="stickerHeight" class="text-sm font-medium text-slate-600">Height (in)</label>
+                            <input type="number" id="stickerHeight" placeholder="e.g., 3" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center">
+                        <input type="checkbox" id="stickerLaminated" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="stickerLaminated" class="ml-2 block text-sm text-slate-600">Add Lamination</label>
+                    </div>
+                </div>
+                <div id="stickerDocSizeSection" class="hidden">
+                     <div>
+                        <label for="stickerDocSize" class="text-sm font-medium text-slate-600">Select Size</label>
+                        <select id="stickerDocSize" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none">
+                            <option value="A4">A4</option>
+                            <option value="A5">A5</option>
+                            <option value="A3">A3</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sintra Board Calculator Section -->
+            <div id="sintraCalculator" class="hidden space-y-6">
+                <div class="p-2 bg-gray-100 grid grid-cols-2 gap-2 rounded-lg">
+                    <button id="sintraLargeFormatTab" class="sub-tab-button py-2 px-4 rounded-md text-sm">Large Format</button>
+                    <button id="sintraDocSizeTab" class="sub-tab-button py-2 px-4 rounded-md text-sm">Document Size</button>
+                </div>
+                <div id="sintraLargeFormatSection">
+                    <div>
+                        <label for="sintraCutType" class="text-sm font-medium text-slate-600">Cut Type</label>
+                        <select id="sintraCutType" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none">
+                            <option value="straight">Straight Cut</option>
+                            <option value="custom">Custom Shape</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label for="sintraWidth" class="text-sm font-medium text-slate-600">Width (in)</label>
+                            <input type="number" id="sintraWidth" placeholder="e.g., 8" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="sintraHeight" class="text-sm font-medium text-slate-600">Height (in)</label>
+                            <input type="number" id="sintraHeight" placeholder="e.g., 12" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center">
+                        <input type="checkbox" id="sintraLaminated" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="sintraLaminated" class="ml-2 block text-sm text-slate-600">Add Lamination</label>
+                    </div>
+                </div>
+                <div id="sintraDocSizeSection" class="hidden">
+                     <div>
+                        <label for="sintraDocSize" class="text-sm font-medium text-slate-600">Select Size</label>
+                        <select id="sintraDocSize" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none">
+                            <option value="A4">A4</option>
+                            <option value="A5">A5</option>
+                            <option value="A3">A3</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Printing Calculator Section -->
+            <div id="documentCalculator" class="hidden space-y-6">
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="docPrintSize" class="text-sm font-medium text-slate-600">Paper Size</label>
+                        <select id="docPrintSize" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none">
+                            <option value="Short">Short</option>
+                            <option value="A4">A4</option>
+                            <option value="Long">Long</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="docPrintType" class="text-sm font-medium text-slate-600">Print Type</label>
+                        <select id="docPrintType" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none">
+                            <option value="bw">Black & White (Text)</option>
+                            <option value="minimal">Minimal Color</option>
+                            <option value="full">Full Color</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Addons (Shared) -->
+            <div class="pt-6 space-y-4 border-t border-gray-200">
+                <div class="flex items-center">
+                    <input type="checkbox" id="layoutDesign" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <label for="layoutDesign" class="ml-2 block text-sm text-slate-600">Add Layout Design</label>
+                </div>
+            </div>
+
+            <!-- Quantity (Shared) -->
+            <div class="pt-6">
+                <label for="quantity" class="text-sm font-medium text-slate-600">Quantity</label>
+                <input type="number" id="quantity" value="1" min="1" class="mt-1 w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+        </div>
+
+        <!-- Total Price Display -->
+        <div class="p-8 bg-slate-50 rounded-b-2xl">
+             <div class="price-display text-white p-6 rounded-xl text-center shadow-lg shadow-slate-800/20">
+                <p class="text-lg font-medium opacity-80">Total Price</p>
+                <p id="totalPrice" class="text-5xl font-bold tracking-tight">₱0.00</p>
+            </div>
+            <button id="resetBtn" class="w-full mt-6 py-3 px-4 bg-slate-200 text-slate-600 font-semibold rounded-lg hover:bg-slate-300 transition-all duration-300 flex items-center justify-center gap-2">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                Reset
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h2 class="text-xl font-bold text-slate-800">Price Settings</h2>
+                <button id="closeSettingsBtn" class="text-slate-500 hover:text-red-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-8 space-y-6 overflow-y-auto">
+                <!-- Tarpaulin Prices -->
+                <div class="space-y-4 p-4 border rounded-lg">
+                    <h3 class="font-semibold text-lg text-slate-700">Tarpaulin</h3>
+                    <div>
+                        <label for="settingTarpPrice" class="text-sm font-medium text-slate-600">Price per Square Foot (₱)</label>
+                        <input type="number" id="settingTarpPrice" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                    </div>
+                </div>
+                <!-- Document Printing Prices -->
+                <div class="space-y-4 p-4 border rounded-lg">
+                    <h3 class="font-semibold text-lg text-slate-700">Document Printing</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <h4 class="font-medium text-slate-600 mb-2">Short</h4>
+                            <label for="settingDocShortBw" class="text-xs">B&W</label>
+                            <input type="number" id="settingDocShortBw" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                            <label for="settingDocShortMinimal" class="text-xs mt-2 block">Minimal</label>
+                            <input type="number" id="settingDocShortMinimal" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                            <label for="settingDocShortFull" class="text-xs mt-2 block">Full</label>
+                            <input type="number" id="settingDocShortFull" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-slate-600 mb-2">A4</h4>
+                             <label for="settingDocA4Bw" class="text-xs">B&W</label>
+                            <input type="number" id="settingDocA4Bw" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                            <label for="settingDocA4Minimal" class="text-xs mt-2 block">Minimal</label>
+                            <input type="number" id="settingDocA4Minimal" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                            <label for="settingDocA4Full" class="text-xs mt-2 block">Full</label>
+                            <input type="number" id="settingDocA4Full" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-slate-600 mb-2">Long</h4>
+                            <label for="settingDocLongBw" class="text-xs">B&W</label>
+                            <input type="number" id="settingDocLongBw" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                            <label for="settingDocLongMinimal" class="text-xs mt-2 block">Minimal</label>
+                            <input type="number" id="settingDocLongMinimal" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                            <label for="settingDocLongFull" class="text-xs mt-2 block">Full</label>
+                            <input type="number" id="settingDocLongFull" class="setting-input w-full p-2 bg-slate-50 border rounded-lg">
+                        </div>
+                    </div>
+                </div>
+                <!-- Sticker Prices -->
+                <div class="space-y-4 p-4 border rounded-lg">
+                    <h3 class="font-semibold text-lg text-slate-700">Sticker</h3>
+                    <h4 class="font-medium text-slate-600">Large Format</h4>
+                    <div>
+                        <label for="settingStickerPrice" class="text-sm font-medium text-slate-600">Price per Square Inch (₱)</label>
+                        <input type="number" id="settingStickerPrice" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                    </div>
+                    <h4 class="font-medium text-slate-600">Document Sizes</h4>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label for="settingStickerA4" class="text-sm font-medium text-slate-600">A4 Price (₱)</label>
+                            <input type="number" id="settingStickerA4" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="settingStickerA5" class="text-sm font-medium text-slate-600">A5 Price (₱)</label>
+                            <input type="number" id="settingStickerA5" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="settingStickerA3" class="text-sm font-medium text-slate-600">A3 Price (₱)</label>
+                            <input type="number" id="settingStickerA3" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+                <!-- Sintra Board Prices -->
+                <div class="space-y-4 p-4 border rounded-lg">
+                    <h3 class="font-semibold text-lg text-slate-700">Sintra Board</h3>
+                     <h4 class="font-medium text-slate-600">Large Format</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                           <label for="settingSintraStraight" class="text-sm font-medium text-slate-600">Straight Cut (₱/sq.in)</label>
+                           <input type="number" id="settingSintraStraight" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                           <label for="settingSintraCustom" class="text-sm font-medium text-slate-600">Custom Shape (₱/sq.in)</label>
+                           <input type="number" id="settingSintraCustom" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+                     <h4 class="font-medium text-slate-600">Document Sizes</h4>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label for="settingSintraA4" class="text-sm font-medium text-slate-600">A4 Price (₱)</label>
+                            <input type="number" id="settingSintraA4" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="settingSintraA5" class="text-sm font-medium text-slate-600">A5 Price (₱)</label>
+                            <input type="number" id="settingSintraA5" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="settingSintraA3" class="text-sm font-medium text-slate-600">A3 Price (₱)</label>
+                            <input type="number" id="settingSintraA3" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+                 <!-- Addons Prices -->
+                <div class="space-y-4 p-4 border rounded-lg">
+                    <h3 class="font-semibold text-lg text-slate-700">Add-ons</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                           <label for="settingLamination" class="text-sm font-medium text-slate-600">Lamination (₱/sq.in)</label>
+                           <input type="number" id="settingLamination" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                           <label for="settingLayout" class="text-sm font-medium text-slate-600">Layout Design (₱)</label>
+                           <input type="number" id="settingLayout" class="setting-input mt-1 w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t bg-slate-50 rounded-b-2xl">
+                <button id="saveSettingsBtn" class="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300">
+                    Save and Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element References ---
+            const tarpaulinMainTab = document.getElementById('tarpaulinMainTab');
+            const stickerMainTab = document.getElementById('stickerMainTab');
+            const sintraMainTab = document.getElementById('sintraMainTab');
+            const documentMainTab = document.getElementById('documentMainTab');
+            const tarpaulinCalculator = document.getElementById('tarpaulinCalculator');
+            const stickerCalculator = document.getElementById('stickerCalculator');
+            const sintraCalculator = document.getElementById('sintraCalculator');
+            const documentCalculator = document.getElementById('documentCalculator');
+            
+            const stickerLargeFormatTab = document.getElementById('stickerLargeFormatTab');
+            const stickerDocSizeTab = document.getElementById('stickerDocSizeTab');
+            const stickerLargeFormatSection = document.getElementById('stickerLargeFormatSection');
+            const stickerDocSizeSection = document.getElementById('stickerDocSizeSection');
+
+            const sintraLargeFormatTab = document.getElementById('sintraLargeFormatTab');
+            const sintraDocSizeTab = document.getElementById('sintraDocSizeTab');
+            const sintraLargeFormatSection = document.getElementById('sintraLargeFormatSection');
+            const sintraDocSizeSection = document.getElementById('sintraDocSizeSection');
+
+            // --- Input Elements ---
+            const tarpWidthInput = document.getElementById('tarpWidth');
+            const tarpHeightInput = document.getElementById('tarpHeight');
+            const tarpWidthUnit = document.getElementById('tarpWidthUnit');
+            const tarpHeightUnit = document.getElementById('tarpHeightUnit');
+
+            const stickerWidthInput = document.getElementById('stickerWidth');
+            const stickerHeightInput = document.getElementById('stickerHeight');
+            const stickerDocSizeSelect = document.getElementById('stickerDocSize');
+            const stickerLaminatedCheckbox = document.getElementById('stickerLaminated');
+
+            const sintraCutTypeSelect = document.getElementById('sintraCutType');
+            const sintraWidthInput = document.getElementById('sintraWidth');
+            const sintraHeightInput = document.getElementById('sintraHeight');
+            const sintraDocSizeSelect = document.getElementById('sintraDocSize');
+            const sintraLaminatedCheckbox = document.getElementById('sintraLaminated');
+
+            const docPrintSizeSelect = document.getElementById('docPrintSize');
+            const docPrintTypeSelect = document.getElementById('docPrintType');
+            
+            const layoutDesignCheckbox = document.getElementById('layoutDesign');
+            const quantityInput = document.getElementById('quantity');
+            const totalPriceDisplay = document.getElementById('totalPrice');
+            const resetBtn = document.getElementById('resetBtn');
+
+            // --- Settings Modal Elements ---
+            const settingsBtn = document.getElementById('settingsBtn');
+            const settingsModal = document.getElementById('settingsModal');
+            const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+            const settingInputs = {
+                tarpPrice: document.getElementById('settingTarpPrice'),
+                docShortBw: document.getElementById('settingDocShortBw'),
+                docShortMinimal: document.getElementById('settingDocShortMinimal'),
+                docShortFull: document.getElementById('settingDocShortFull'),
+                docA4Bw: document.getElementById('settingDocA4Bw'),
+                docA4Minimal: document.getElementById('settingDocA4Minimal'),
+                docA4Full: document.getElementById('settingDocA4Full'),
+                docLongBw: document.getElementById('settingDocLongBw'),
+                docLongMinimal: document.getElementById('settingDocLongMinimal'),
+                docLongFull: document.getElementById('settingDocLongFull'),
+                stickerPrice: document.getElementById('settingStickerPrice'),
+                stickerA4: document.getElementById('settingStickerA4'),
+                stickerA5: document.getElementById('settingStickerA5'),
+                stickerA3: document.getElementById('settingStickerA3'),
+                sintraStraight: document.getElementById('settingSintraStraight'),
+                sintraCustom: document.getElementById('settingSintraCustom'),
+                sintraA4: document.getElementById('settingSintraA4'),
+                sintraA5: document.getElementById('settingSintraA5'),
+                sintraA3: document.getElementById('settingSintraA3'),
+                lamination: document.getElementById('settingLamination'),
+                layout: document.getElementById('settingLayout'),
+            };
+
+            // --- State ---
+            let mainMode = 'tarpaulin';
+            let stickerMode = 'large_format';
+            let sintraMode = 'large_format';
+
+            // --- Pricing & Conversion Data ---
+            let prices = {};
+            const conversionToFt = { ft: 1, in: 1 / 12 };
+
+            const defaultPrices = {
+                tarpPrice: 25,
+                docShortBw: 5,
+                docShortMinimal: 8,
+                docShortFull: 10,
+                docA4Bw: 6,
+                docA4Minimal: 9,
+                docA4Full: 11,
+                docLongBw: 7,
+                docLongMinimal: 10,
+                docLongFull: 12,
+                stickerPrice: 1,
+                stickerA4: 50,
+                stickerA5: 30,
+                stickerA3: 100,
+                sintraStraight: 1,
+                sintraCustom: 1.5,
+                sintraA4: 120,
+                sintraA5: 80,
+                sintraA3: 240,
+                lamination: 0.30,
+                layout: 150,
+            };
+
+            // --- Functions ---
+            const loadPrices = () => {
+                const savedPrices = localStorage.getItem('printingCalculatorPrices');
+                prices = savedPrices ? JSON.parse(savedPrices) : { ...defaultPrices };
+                for (const key in settingInputs) {
+                    if (prices[key] !== undefined) {
+                        settingInputs[key].value = prices[key];
+                    }
+                }
+                updateLabels();
+            };
+            
+            const savePrices = () => {
+                for (const key in settingInputs) {
+                    prices[key] = parseFloat(settingInputs[key].value) || 0;
+                }
+                localStorage.setItem('printingCalculatorPrices', JSON.stringify(prices));
+                updateLabels();
+                calculatePrice();
+            };
+            
+            const updateLabels = () => {
+                document.querySelector('label[for="stickerLaminated"]').textContent = `Add Lamination (+₱${prices.lamination}/sq.in)`;
+                document.querySelector('label[for="sintraLaminated"]').textContent = `Add Lamination (+₱${prices.lamination}/sq.in)`;
+                document.querySelector('label[for="layoutDesign"]').textContent = `Add Layout Design (+₱${prices.layout.toFixed(2)})`;
+            };
+
+            const calculatePrice = () => {
+                const quantity = parseInt(quantityInput.value) || 1;
+                let subTotal = 0;
+
+                if (mainMode === 'tarpaulin') {
+                    const pricePerSqFt = prices.tarpPrice;
+                    const width = parseFloat(tarpWidthInput.value) || 0;
+                    const height = parseFloat(tarpHeightInput.value) || 0;
+                    const widthInFt = width * conversionToFt[tarpWidthUnit.value];
+                    const heightInFt = height * conversionToFt[tarpHeightUnit.value];
+                    subTotal = widthInFt * heightInFt * pricePerSqFt;
+
+                } else if (mainMode === 'sticker') {
+                    if (stickerMode === 'large_format') {
+                        const pricePerSqIn = prices.stickerPrice;
+                        const width = parseFloat(stickerWidthInput.value) || 0;
+                        const height = parseFloat(stickerHeightInput.value) || 0;
+                        const area = width * height;
+                        subTotal = area * pricePerSqIn;
+                        if (stickerLaminatedCheckbox.checked) {
+                            subTotal += area * prices.lamination;
+                        }
+                    } else {
+                        subTotal = prices['sticker' + stickerDocSizeSelect.value] || 0;
+                    }
+                } else if (mainMode === 'sintra') {
+                    if (sintraMode === 'large_format') {
+                        const cutType = sintraCutTypeSelect.value;
+                        const pricePerSqIn = (cutType === 'custom') ? prices.sintraCustom : prices.sintraStraight;
+                        const width = parseFloat(sintraWidthInput.value) || 0;
+                        const height = parseFloat(sintraHeightInput.value) || 0;
+                        const area = width * height;
+                        subTotal = area * pricePerSqIn;
+                        if (sintraLaminatedCheckbox.checked) {
+                            subTotal += area * prices.lamination;
+                        }
+                    } else {
+                        subTotal = prices['sintra' + sintraDocSizeSelect.value] || 0;
+                    }
+                } else if (mainMode === 'document') {
+                    const size = docPrintSizeSelect.value; // Short, A4, Long
+                    const type = docPrintTypeSelect.value; // bw, minimal, full
+                    const priceKey = `doc${size}${type.charAt(0).toUpperCase() + type.slice(1)}`;
+                    subTotal = prices[priceKey] || 0;
+                }
+                
+                let total = subTotal * quantity;
+
+                if (layoutDesignCheckbox.checked) {
+                    total += prices.layout;
+                }
+
+                totalPriceDisplay.textContent = `₱${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            };
+
+            const switchMainMode = (mode) => {
+                mainMode = mode;
+                tarpaulinMainTab.classList.toggle('active', mode === 'tarpaulin');
+                stickerMainTab.classList.toggle('active', mode === 'sticker');
+                sintraMainTab.classList.toggle('active', mode === 'sintra');
+                documentMainTab.classList.toggle('active', mode === 'document');
+                tarpaulinCalculator.classList.toggle('hidden', mode !== 'tarpaulin');
+                stickerCalculator.classList.toggle('hidden', mode !== 'sticker');
+                sintraCalculator.classList.toggle('hidden', mode !== 'sintra');
+                documentCalculator.classList.toggle('hidden', mode !== 'document');
+                calculatePrice();
+            };
+
+            const switchStickerMode = (mode) => {
+                stickerMode = mode;
+                stickerLargeFormatTab.classList.toggle('active', mode === 'large_format');
+                stickerDocSizeTab.classList.toggle('active', mode === 'doc_size');
+                stickerLargeFormatSection.classList.toggle('hidden', mode !== 'large_format');
+                stickerDocSizeSection.classList.toggle('hidden', mode !== 'doc_size');
+                calculatePrice();
+            };
+
+            const switchSintraMode = (mode) => {
+                sintraMode = mode;
+                sintraLargeFormatTab.classList.toggle('active', mode === 'large_format');
+                sintraDocSizeTab.classList.toggle('active', mode === 'doc_size');
+                sintraLargeFormatSection.classList.toggle('hidden', mode !== 'large_format');
+                sintraDocSizeSection.classList.toggle('hidden', mode !== 'doc_size');
+                calculatePrice();
+            };
+            
+            const resetCalculator = () => {
+                // Reset all inputs to their default values
+                tarpWidthInput.value = '';
+                tarpHeightInput.value = '';
+                tarpWidthUnit.value = 'ft';
+                tarpHeightUnit.value = 'ft';
+                
+                stickerWidthInput.value = '';
+                stickerHeightInput.value = '';
+                stickerDocSizeSelect.value = 'A4';
+                stickerLaminatedCheckbox.checked = false;
+
+                sintraCutTypeSelect.value = 'straight';
+                sintraWidthInput.value = '';
+                sintraHeightInput.value = '';
+                sintraDocSizeSelect.value = 'A4';
+                sintraLaminatedCheckbox.checked = false;
+
+                docPrintSizeSelect.value = 'Short';
+                docPrintTypeSelect.value = 'bw';
+                
+                layoutDesignCheckbox.checked = false;
+                quantityInput.value = '1';
+                
+                // Reset view to default state and calculate
+                switchMainMode('tarpaulin');
+                switchStickerMode('large_format');
+                switchSintraMode('large_format');
+            };
+
+            // --- Event Listeners ---
+            tarpaulinMainTab.addEventListener('click', () => switchMainMode('tarpaulin'));
+            stickerMainTab.addEventListener('click', () => switchMainMode('sticker'));
+            sintraMainTab.addEventListener('click', () => switchMainMode('sintra'));
+            documentMainTab.addEventListener('click', () => switchMainMode('document'));
+            
+            stickerLargeFormatTab.addEventListener('click', () => switchStickerMode('large_format'));
+            stickerDocSizeTab.addEventListener('click', () => switchStickerMode('doc_size'));
+
+            sintraLargeFormatTab.addEventListener('click', () => switchSintraMode('large_format'));
+            sintraDocSizeTab.addEventListener('click', () => switchSintraMode('doc_size'));
+
+            const allInputs = document.querySelectorAll('input, select');
+            allInputs.forEach(input => {
+                input.addEventListener('input', calculatePrice);
+                input.addEventListener('change', calculatePrice);
+            });
+            resetBtn.addEventListener('click', resetCalculator);
+
+            // Settings Modal Listeners
+            settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+            closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+            saveSettingsBtn.addEventListener('click', () => {
+                savePrices();
+                settingsModal.classList.add('hidden');
+            });
+
+            // --- Initial Setup ---
+            lucide.createIcons();
+            loadPrices();
+            switchMainMode('tarpaulin');
+            switchStickerMode('large_format');
+            switchSintraMode('large_format');
+        });
+    </script>
+
+</body>
+</html>
