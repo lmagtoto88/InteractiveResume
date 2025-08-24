@@ -6,8 +6,6 @@
     <title>Interactive Resume | Lorimar Magtoto-Beso</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -56,15 +54,18 @@
                 height: 400px;
             }
         }
-        .download-button {
+        .download-link {
+            display: inline-block;
             background-color: #3B82F6;
             color: white;
             padding: 10px 20px;
             border-radius: 9999px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease;
+            text-decoration: none;
+            font-weight: 500;
         }
-        .download-button:hover {
+        .download-link:hover {
             background-color: #2563EB;
         }
     </style>
@@ -90,8 +91,8 @@
             <p class="max-w-3xl mx-auto text-gray-700 leading-relaxed">
                 An accomplished IT professional with extensive experience in leading and managing complex system implementations and digital transformations within the automotive industry. Proven expertise in spearheading end-to-end projects, from initial business requirement analysis to final deployment and support.
             </p>
-            <!-- New download button section -->
-            <button id="downloadPdfBtn" class="download-button mt-6">Download Resume (PDF)</button>
+            <!-- New download link section -->
+            <a href="https://lmagtoto88.github.io/InteractiveResume/08242025%20Magtoto%20Beso%20Lorimar.docx" download class="download-link mt-6">Download Resume (DOCX)</a>
         </section>
 
         <section id="journey" class="mb-16">
@@ -318,59 +319,6 @@
                         link.classList.add('active');
                     }
                 });
-            });
-
-            // Function to generate and download the PDF
-            document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
-                const { jsPDF } = window.jspdf;
-                const resumeContent = document.querySelector('main');
-                const originalDisplay = resumeContent.style.display;
-                const originalTransform = resumeContent.style.transform;
-                const originalPosition = resumeContent.style.position;
-                
-                // Temporarily unhide everything for the screenshot
-                document.querySelectorAll('.details').forEach(el => el.classList.remove('hidden'));
-
-                // Capture the entire resume content as an image
-                const canvas = await html2canvas(resumeContent, {
-                    scale: 2, // Increase scale for better resolution
-                    logging: true,
-                    useCORS: true,
-                    allowTaint: true,
-                    scrollX: -window.scrollX,
-                    scrollY: -window.scrollY,
-                    windowWidth: document.documentElement.offsetWidth,
-                    windowHeight: document.documentElement.offsetHeight
-                });
-
-                // Get the image data
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgWidth = 210; // A4 width in mm
-                const pageHeight = 297; // A4 height in mm
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-                
-                // Reset the display of the timeline details
-                document.querySelectorAll('.timeline-item').forEach(item => {
-                    const details = item.querySelector('.details');
-                    if (details.classList.contains('hidden') === false) {
-                        details.classList.add('hidden');
-                    }
-                });
-
-                pdf.save('Lorimar_Magtoto_Beso_Resume.pdf');
             });
         });
     </script>
