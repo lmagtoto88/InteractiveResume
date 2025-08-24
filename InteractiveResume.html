@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Resume | Lorimar Magtoto-Beso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Subtle Blue Accent -->
+    <!-- Application Structure Plan: The application is structured into four main thematic sections: a header for identity, 'Career Journey' for chronological experience, 'Core Competencies' for skills visualization, and 'Project Highlights' for detailed accomplishments. This structure was chosen to guide the user from a high-level summary to specific details logically. The interactive timeline and skills chart make the information more digestible and engaging than a static list, improving usability and allowing users to quickly grasp key qualifications. The career journey is now grouped by company, allowing for a clearer view of progression within a single organization. -->
+    <!-- Visualization & Content Choices: 1. Career Journey (Experience) -> Goal: Show change over time -> Viz: Interactive Timeline (HTML/CSS/JS) -> Interaction: Clicking on a company name expands to reveal roles and their details. Justification: Grouping by company provides a clearer, more logical narrative for progression, which is more intuitive for viewers. 2. Core Competencies (Skills) -> Goal: Compare skill proficiency/focus -> Viz: Radar Chart (Chart.js) -> Interaction: Hovering over points shows skill names. Justification: A radar chart provides a quick, holistic view of technical and managerial strengths. 3. Project Highlights (Key Accomplishments) -> Goal: Organize and detail key projects -> Viz: Clickable Cards (HTML/CSS/JS) -> Interaction: Clicking a card reveals project details. Justification: Cards are a clean, modern way to present distinct pieces of information. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link.active {
+            color: #3B82F6;
+            border-bottom-color: #3B82F6;
+        }
+        .timeline-item {
+            border-left: 3px solid #D1D5DB;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -9px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #FDFBF8;
+            border: 3px solid #3B82F6;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">Lorimar Magtoto-Beso</h1>
+                <p class="text-sm text-gray-600">IT Professional | System Development Manager</p>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#journey" class="nav-link text-gray-600 hover:text-blue-500 border-b-2 border-transparent pb-1">Career Journey</a>
+                <a href="#competencies" class="nav-link text-gray-600 hover:text-blue-500 border-b-2 border-transparent pb-1">Competencies</a>
+                <a href="#projects" class="nav-link text-gray-600 hover:text-blue-500 border-b-2 border-transparent pb-1">Project Highlights</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-6 md:p-12">
+        <section id="summary" class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Professional Summary</h2>
+            <p class="max-w-3xl mx-auto text-gray-700 leading-relaxed">
+                An accomplished IT professional with extensive experience in leading and managing complex system implementations and digital transformations within the automotive industry. Proven expertise in spearheading end-to-end projects, from initial business requirement analysis to final deployment and support.
+            </p>
+        </section>
+
+        <section id="journey" class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Career Journey</h2>
+            <div id="timeline-container" class="relative">
+            </div>
+        </section>
+
+        <section id="competencies" class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Core Competencies</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">A visual representation of key skills, balancing technical expertise with project management and strategic planning capabilities.</p>
+            <div class="chart-container">
+                <canvas id="skillsChart"></canvas>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Project Highlights</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Key initiatives and system implementations that demonstrate leadership, technical acumen, and a commitment to enhancing business operations.</p>
+            <div id="projects-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white mt-16 py-6 border-t">
+        <div class="container mx-auto px-6 text-center text-gray-600">
+            <p>&copy; 2025 Lorimar Magtoto-Beso</p>
+            <p>San Jose Del Monte, Bulacan, Philippines | lorimarmagtoto@gmail.com</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const experienceData = [
+                {
+                    company: 'Hyundai Motor Philippines, Inc.',
+                    duration: 'Feb 2022 - Present',
+                    roles: [
+                        {
+                            role: 'System Development Manager',
+                            date: 'Feb 2022 - Present',
+                            details: [
+                                'Led SAP ERP implementation, Salesforce DMS deployment, and API integrations, ensuring seamless system migration and integration.',
+                                'Managed cross-functional teams to deliver project timelines, budgets, and scope, with risk mitigation and stakeholder communication.',
+                                'Analyzed and translated business requirements into technical specifications, facilitating system design, testing, and deployment.',
+                                'Assessed physical and technical security risks, including vulnerability and privacy impact assessments, and developed company policies to ensure data integrity and compliance.',
+                                'Conducted system maintenance, troubleshooting, and support, including updates, patches, and user training to ensure optimal performance.'
+                            ]
+                        }
+                    ]
+                },
+                {
+                    company: 'Hyundai Asia Resources, Inc.',
+                    duration: '2011 - Jul 2022',
+                    roles: [
+                        {
+                            role: 'Sales Systems and Standards Head',
+                            date: 'Jul 2022 - Nov 2019',
+                            details: [
+                                'Led development of Hyundai CRM, Loyalty Management System, and Customer Assistance platform, enhancing customer engagement and support operations.',
+                                'Designed system automations, data analytics, and documentation, ensuring high-quality customer data and streamlined system processes.',
+                                'Managed system training, user support, and semi-annual audits to maintain compliance and optimal system utilization across dealerships.',
+                                'Spearheaded key system upgrades for fleet registration, improving monitoring of client and government agency engagements.'
+                            ]
+                        },
+                        {
+                            role: 'IT Supervisor',
+                            date: '2015-2016',
+                            details: [
+                                'Focused on the development of Hyundai CARES, a contact center ticketing platform integrated with a softphone.',
+                                'Responsible for designing requirements through functional and technical blueprints.'
+                            ]
+                        },
+                        {
+                            role: 'IT Specialist',
+                            date: '2013-2014',
+                            details: [
+                                'Focused on the development of a loyalty website system application.',
+                                'Managed data generation for the loyalty website system.'
+                            ]
+                        },
+                        {
+                            role: 'IT Analyst',
+                            date: '2011-2012',
+                            details: [
+                                'Focused on the development of a CRM application.'
+                            ]
+                        }
+                    ]
+                }
+            ];
+
+            const projectsData = [
+                {
+                    title: 'SAP ERP Implementation',
+                    description: 'Led the full-cycle implementation of SAP ERP, integrating financial, sales, and logistics modules to streamline business operations.'
+                },
+                {
+                    title: 'Salesforce DMS Deployment',
+                    description: 'Managed the deployment of a Salesforce-based Dealer Management System across the national dealership network for improved sales tracking.'
+                },
+                {
+                    title: 'Custom CRM & Loyalty System',
+                    description: 'Headed the in-house development of a customer relationship management and loyalty system to enhance customer engagement and retention.'
+                },
+                {
+                    title: 'API Integration Hub',
+                    description: 'Oversaw the integration of multiple third-party systems with core company platforms using a centralized API hub.'
+                },
+                {
+                    title: 'Security & Compliance Framework',
+                    description: 'Developed and implemented company-wide policies for data integrity and security based on vulnerability and privacy impact assessments.'
+                },
+                 {
+                    title: 'System Automation Initiative',
+                    description: 'Designed and rolled out various system automations that significantly reduced manual data entry and streamlined internal processes.'
+                }
+            ];
+
+            const timelineContainer = document.getElementById('timeline-container');
+            experienceData.forEach(company => {
+                const companyEl = document.createElement('div');
+                companyEl.className = 'timeline-item relative pl-12 pb-12 cursor-pointer';
+                companyEl.innerHTML = `
+                    <div class="timeline-dot"></div>
+                    <p class="text-sm text-blue-500 font-semibold">${company.duration}</p>
+                    <h3 class="text-xl font-bold text-gray-800">${company.company}</h3>
+                    <div class="details hidden mt-4 pl-4 border-l-2 border-gray-300 space-y-4">
+                        ${company.roles.map(role => `
+                            <div>
+                                <h4 class="font-semibold text-gray-700">${role.role} <span class="text-sm font-normal text-gray-500">(${role.date})</span></h4>
+                                <ul class="list-disc list-inside space-y-1 text-gray-600 mt-1">
+                                    ${role.details.map(d => `<li>${d}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                timelineContainer.appendChild(companyEl);
+
+                companyEl.addEventListener('click', () => {
+                    const details = companyEl.querySelector('.details');
+                    details.classList.toggle('hidden');
+                });
+            });
+
+            const projectsContainer = document.getElementById('projects-container');
+            projectsData.forEach(project => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300';
+                card.innerHTML = `
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">${project.title}</h3>
+                    <p class="text-gray-600">${project.description}</p>
+                `;
+                projectsContainer.appendChild(card);
+            });
+
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Project Management', 'System Implementation', 'Requirements Analysis', 'API Integration', 'Security & Compliance', 'Data Analytics', 'Team Leadership'],
+                    datasets: [{
+                        label: 'Skill Level',
+                        data: [9, 9, 8, 8, 7, 7, 9],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#4A4A4A'
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                stepSize: 2
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
