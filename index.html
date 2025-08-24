@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Warm Neutrals with Subtle Blue Accent -->
-    <!-- Application Structure Plan: The application is structured into four main thematic sections: a header for identity, 'Career Journey' for chronological experience, 'Core Competencies' for skills visualization, and 'Project Highlights' for detailed accomplishments. This structure was chosen to guide the user from a high-level summary to specific details logically. The interactive timeline and skills chart make the information more digestible and engaging than a static list, improving usability and allowing users to quickly grasp key qualifications. The career journey is now grouped by company, allowing for a clearer view of progression within a single organization. -->
-    <!-- Visualization & Content Choices: 1. Career Journey (Experience) -> Goal: Show change over time -> Viz: Interactive Timeline (HTML/CSS/JS) -> Interaction: Clicking on a company name expands to reveal roles and their details. Justification: Grouping by company provides a clearer, more logical narrative for progression, which is more intuitive for viewers. 2. Core Competencies (Skills) -> Goal: Compare skill proficiency/focus -> Viz: Radar Chart (Chart.js) -> Interaction: Hovering over points shows skill names. Justification: A radar chart provides a quick, holistic view of technical and managerial strengths. 3. Project Highlights (Key Accomplishments) -> Goal: Organize and detail key projects -> Viz: Clickable Cards (HTML/CSS/JS) -> Interaction: Clicking a card reveals project details. Justification: Cards are a clean, modern way to present distinct pieces of information. -->
+    <!-- Application Structure Plan: The application is structured into five main thematic sections: a header for identity, 'Career Journey' for chronological experience, 'Core Competencies' for skills visualization, 'Interactive Projects' for a demonstration of skills, and 'Project Highlights' for detailed accomplishments. This structure was chosen to guide the user from a high-level summary to specific details logically. The interactive timeline and skills chart make the information more digestible and engaging than a static list, improving usability and allowing users to quickly grasp key qualifications. The career journey is now grouped by company, allowing for a clearer view of progression within a single organization. -->
+    <!-- Visualization & Content Choices: 1. Career Journey (Experience) -> Goal: Show change over time -> Viz: Interactive Timeline (HTML/CSS/JS) -> Interaction: Clicking on a company name expands to reveal roles and their details. Justification: Grouping by company provides a clearer, more logical narrative for progression, which is more intuitive for viewers. 2. Core Competencies (Skills) -> Goal: Compare skill proficiency/focus -> Viz: Radar Chart (Chart.js) -> Interaction: Hovering over points shows skill names. Justification: A radar chart provides a quick, holistic view of technical and managerial strengths. 3. Interactive Projects -> Goal: Showcase live, hands-on work -> Viz: Clickable Cards with links (HTML/CSS/JS) -> Interaction: Clicking a card directs to an external project. Justification: This new section allows for a more dynamic and impressive showcase of actual applications. 4. Project Highlights (Key Accomplishments) -> Goal: Organize and detail key projects -> Viz: Clickable Cards (HTML/CSS/JS) -> Interaction: Clicking a card reveals project details. Justification: Cards are a clean, modern way to present distinct pieces of information. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
@@ -80,6 +80,7 @@
             <div class="hidden md:flex space-x-8">
                 <a href="#journey" class="nav-link text-gray-600 hover:text-blue-500 border-b-2 border-transparent pb-1">Career Journey</a>
                 <a href="#competencies" class="nav-link text-gray-600 hover:text-blue-500 border-b-2 border-transparent pb-1">Competencies</a>
+                <a href="#apps" class="nav-link text-gray-600 hover:text-blue-500 border-b-2 border-transparent pb-1">Interactive Projects</a>
                 <a href="#projects" class="nav-link text-gray-600 hover:text-blue-500 border-b-2 border-transparent pb-1">Project Highlights</a>
             </div>
         </nav>
@@ -106,6 +107,13 @@
             <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">A visual representation of key skills, balancing technical expertise with project management and strategic planning capabilities.</p>
             <div class="chart-container">
                 <canvas id="skillsChart"></canvas>
+            </div>
+        </section>
+
+        <section id="apps" class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Interactive Projects</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Showcasing a few live web applications that demonstrate hands-on coding and development skills.</p>
+            <div id="apps-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             </div>
         </section>
 
@@ -184,6 +192,25 @@
                     ]
                 }
             ];
+            
+            // New data for Interactive Projects section
+            const appsData = [
+                {
+                    title: 'Interactive Chatbot',
+                    description: 'A responsive chatbot application demonstrating natural language processing and API integration.',
+                    link: '#' // Placeholder link
+                },
+                {
+                    title: 'Data Visualization Dashboard',
+                    description: 'An interactive dashboard that visualizes complex data sets using modern charting libraries.',
+                    link: '#' // Placeholder link
+                },
+                {
+                    title: 'Task Management App',
+                    description: 'A collaborative task management tool built with a focus on real-time updates and user experience.',
+                    link: '#' // Placeholder link
+                }
+            ];
 
             const projectsData = [
                 {
@@ -237,6 +264,20 @@
                     const details = companyEl.querySelector('.details');
                     details.classList.toggle('hidden');
                 });
+            });
+
+            // Populate new Interactive Projects section
+            const appsContainer = document.getElementById('apps-container');
+            appsData.forEach(app => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer';
+                card.innerHTML = `
+                    <a href="${app.link}" target="_blank" rel="noopener noreferrer" class="block">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">${app.title}</h3>
+                        <p class="text-gray-600">${app.description}</p>
+                    </a>
+                `;
+                appsContainer.appendChild(card);
             });
 
             const projectsContainer = document.getElementById('projects-container');
