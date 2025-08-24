@@ -134,6 +134,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // --- DATA ARRAYS ---
             const experienceData = [
                 {
                     company: 'Hyundai Motor Philippines, Inc.',
@@ -192,23 +193,22 @@
                     ]
                 }
             ];
-            
-            // New data for Interactive Projects section
+
             const appsData = [
                 {
                     title: 'Interactive Chatbot',
                     description: 'A responsive chatbot application demonstrating natural language processing and API integration.',
-                    link: '#' // Placeholder link
+                    link: 'https://example.com/chatbot-demo' // Updated link to a hypothetical external file
                 },
                 {
                     title: 'Data Visualization Dashboard',
                     description: 'An interactive dashboard that visualizes complex data sets using modern charting libraries.',
-                    link: '#' // Placeholder link
+                    link: '#'
                 },
                 {
                     title: 'Task Management App',
                     description: 'A collaborative task management tool built with a focus on real-time updates and user experience.',
-                    link: '#' // Placeholder link
+                    link: '#'
                 }
             ];
 
@@ -239,6 +239,7 @@
                 }
             ];
 
+            // --- UI POPULATION FUNCTIONS ---
             const timelineContainer = document.getElementById('timeline-container');
             experienceData.forEach(company => {
                 const companyEl = document.createElement('div');
@@ -259,25 +260,24 @@
                     </div>
                 `;
                 timelineContainer.appendChild(companyEl);
-
                 companyEl.addEventListener('click', () => {
                     const details = companyEl.querySelector('.details');
                     details.classList.toggle('hidden');
                 });
             });
 
-            // Populate new Interactive Projects section
             const appsContainer = document.getElementById('apps-container');
             appsData.forEach(app => {
-                const card = document.createElement('div');
-                card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer';
-                card.innerHTML = `
-                    <a href="${app.link}" target="_blank" rel="noopener noreferrer" class="block">
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">${app.title}</h3>
-                        <p class="text-gray-600">${app.description}</p>
-                    </a>
+                const a = document.createElement('a');
+                a.href = app.link;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.className = 'block bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300';
+                a.innerHTML = `
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">${app.title}</h3>
+                    <p class="text-gray-600">${app.description}</p>
                 `;
-                appsContainer.appendChild(card);
+                appsContainer.appendChild(a);
             });
 
             const projectsContainer = document.getElementById('projects-container');
@@ -353,7 +353,6 @@
                         current = section.getAttribute('id');
                     }
                 });
-
                 navLinks.forEach(link => {
                     link.classList.remove('active');
                     if (link.getAttribute('href').includes(current)) {
